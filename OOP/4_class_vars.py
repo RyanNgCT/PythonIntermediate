@@ -37,7 +37,8 @@ class Employee:
                         "3. Get Full Name",\
                         "4. Get Pay",\
                         "5. Change ID",\
-                        "6. Raise Pay"]
+                        "6. Raise Pay",\
+                        "7. Save as .csv file"] # to implement
 
                 result = ''
                 for option in menuOptions:
