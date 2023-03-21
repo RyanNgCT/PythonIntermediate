@@ -15,13 +15,13 @@ class Employee:
         return f'{self.firstName} {self.lastName}'
 
     def applyRaise(self, magnitude):
-        self.pay = self.pay * float(magnitude)
+        self.pay = self.pay * magnitude
         return int(self.pay) # cast back
     
 
     def getEmployeeProperties(self, employees, e):
         employeeIDList = [employee.id for employee in employees]
-        menuOptions = ["\nSelect an action:",\
+        menuOptions = ["Select an action:",\
                 "==============",\
                 "0. Quit the Program",\
                 "1. Get First Name",\
@@ -41,7 +41,7 @@ class Employee:
         result += ">>> "
 
         option = input(f'{result}')
-        print() # add line after menu display
+        print()
         if option == '1':
             return e.firstName
         
@@ -70,8 +70,15 @@ class Employee:
         elif option == '6':
             oldPay = e.pay
             magnitude = input('Enter a magnitude for pay adjustment: ')
+            try:
+                if float(magnitude) >= 0:
+                    magnitude = float(magnitude)
+                else:
+                    return f'[ERROR] Negative magnitude is not allowed!'
+            except ValueError:
+                return f'[ERROR] Not a valid magnitude!'
             e.pay = e.applyRaise(magnitude)
-            return f'Updated Employee pay from {oldPay} to {e.pay}'
+            return f'[INFO] Updated Employee pay from {oldPay} to {e.pay}'
         
         elif option == '7':
             employees.sort(key=lambda x:x.id)
@@ -90,10 +97,7 @@ class Employee:
         elif option == '8':
             emp_count = 0
             filePath = input('Please specify the file path to read from: ')
-            #filePath = os.path.abspath(filePath)
-
-            # kind of manipulate file
-            filePath = str(Path(filePath).absolute())
+            filePath = str(Path(filePath).absolute()) # full abs path
 
             # open file for reading
             with open(filePath) as csv_file:
@@ -121,7 +125,17 @@ class Employee:
             return empInfoList
         
         elif option == "10":
-            pass
+            idToRemove = input("Enter Employee id to remove: ")
+            try:
+                idToRemove = int(idToRemove)
+            except ValueError:
+                return f'[ERROR] Please re-verify validity of id added!'
+            if idToRemove not in employeeIDList:
+                return f'[ERROR] employee to remove not found!'
+            for employee in employees:
+                if employee.id == idToRemove:
+                    employees.remove(employee)
+            return f'[INFO] Done removing employee.'
 
         elif option == '0':
             print('Quitting Program...')
@@ -144,10 +158,10 @@ while True:
             personnel = int(personnel)
         except ValueError:
             flag = True
-            print("Not a valid id!")
+            print("[ERROR] Not a valid id!")
     else:
         flag = True
-        print("Empty id. Try again...")
+        print("[ERROR] Empty id. Try again...")
 
     found = False
     for e in employees:
@@ -155,10 +169,10 @@ while True:
             res = e.getEmployeeProperties(employees, e)
             if res == None:
                 sys.exit(1)
-            elif res == 'csv updated': # csv updated
+            # need to check if still needed
+            elif res == 'csv updated': 
                 found = True
                 continue
-            # need to check if still needed
             elif res == 'Error in csv update, please check if employee exist!': # duplicate entry
                 found = True
                 print("Duplicate id entry, please try again")
