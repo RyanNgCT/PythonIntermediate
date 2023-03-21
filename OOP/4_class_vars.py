@@ -1,5 +1,6 @@
 import sys, os, csv
 from pathlib import Path
+from operator import itemgetter
 
 class Employee:
     # constructor
@@ -17,6 +18,11 @@ class Employee:
     def applyRaise(self, magnitude):
         self.pay = self.pay * float(magnitude)
         return int(self.pay) # cast back
+    
+    # def sortEmployeesById(self, employees):
+    #     employeesSorted = employees.sort(key=itemgetter("id"))
+    #     return employeesSorted
+
 
     def getEmployeeProperties(self, employees, e):
         employeeIDList = [employee.id for employee in employees]
@@ -30,8 +36,8 @@ class Employee:
                 "6. Change Pay",\
                 "7. Save current employee list as .csv file",\
                 "8. Read new employees from .csv file", \
-                "9. Quit the Program",\
-                "10. Display all employee details"]
+                "9. Display all employee details", \
+                "10. Quit the Program"]
 
         result = ''
         for option in menuOptions:
@@ -98,12 +104,18 @@ class Employee:
                 # can't use zero for return val as dealing with cost also
                 return 'csv updated'
 
-        elif option == '9':
+        elif option == '10':
             print('Quitting Program...')
             return
         
-        elif option == "10": # implement sort by id
-            pass
+        elif option == "9":
+            # employeesSorted = [em.firstName for em in employees]
+            employees.sort(key=lambda x:x.id)
+            empInfoList = ""
+            for employee in employees:
+                empInfoList += f"Employee {employee.printFullName()} has a salary of ${employee.pay} and email address of {employee.email}...\n"
+            empInfoList += "\n===========Last Entry=========\n"
+            return empInfoList
             
         return 'Invalid option entered.'
 
