@@ -1,4 +1,5 @@
 import sys, os, csv
+from pathlib import Path
 
 class Employee:
     # constructor
@@ -66,32 +67,45 @@ class Employee:
             return f'Updated Employee pay from {oldPay} to {e.pay}'
         
         elif option == '7':
-            pass
+            filePath = input('Please specify name of the output csv: ')
+            currDir = os.getcwd()
+            fullPath = currDir + os.sep + filePath
+            with open(fullPath, 'w', newline='') as csv_file:
+                print("Reading...")
+                csv_writer = csv.writer(csv_file)
+                for employee in employees:
+                    print(employee.id, employee.firstName, employee.lastName, employee.pay)
+                    lineFormat = [employee.id, employee.firstName, employee.lastName, employee.pay]
+                    csv_writer.writerow(lineFormat)
 
-        elif option == '8': # CHORE: need to check for id clashes
+        elif option == '8':
             emp_count = 0
-            filePath = input('Please specify the parent directory path to read from: ')
-            filePath = os.path.abspath(filePath)
+            filePath = input('Please specify the file path to read from: ')
+            #filePath = os.path.abspath(filePath)
+            filePath = str(Path(filePath).absolute())
+
             with open(filePath) as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=',')
+                csv_reader = csv.reader(csv_file)
                 for line in csv_reader:
                     line = list(line)
-                    emp = Employee(int(line[0]), line[1], line[2], int(line[3]))
-                    employees.append(emp)
-                    emp_count += 1
+                    if int(line[0]) in employeeIDList:
+                        return "Error in csv update"
+                    else:
+                        emp = Employee(int(line[0]), line[1], line[2], int(line[3]))
+                        employees.append(emp)
+                        emp_count += 1
                 print(f'\n[INFO] {emp_count} employees loaded into program...\n')
-            # can't use zero for return val as dealing with cost also
-            return 'csv updated'
+                # can't use zero for return val as dealing with cost also
+                return 'csv updated'
 
         elif option == '9':
             print('Quitting Program...')
             return
         
-        elif option == "10":
+        elif option == "10": # implement sort by id
             pass
             
         return 'Invalid option entered.'
-
 
 employees = []
 emp1 = Employee(1, "Hohn", "Jammy", 500)
@@ -115,6 +129,9 @@ while True:
                 print(res)
             elif res == 'csv updated': 
                 found = True # to satisfy flag (may need refactoring)
+                continue
+            elif res == 'Error in csv update':
+                print("Duplicate id entry, please try again")
                 continue
             else:
                 sys.exit(1)
