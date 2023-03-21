@@ -1,6 +1,5 @@
 import sys, os, csv
 from pathlib import Path
-from operator import itemgetter
 
 class Employee:
     # constructor
@@ -19,15 +18,12 @@ class Employee:
         self.pay = self.pay * float(magnitude)
         return int(self.pay) # cast back
     
-    # def sortEmployeesById(self, employees):
-    #     employeesSorted = employees.sort(key=itemgetter("id"))
-    #     return employeesSorted
-
 
     def getEmployeeProperties(self, employees, e):
         employeeIDList = [employee.id for employee in employees]
         menuOptions = ["\nSelect an action:",\
                 "==============",\
+                "0. Quit the Program",\
                 "1. Get First Name",\
                 "2. Get Last Name",\
                 "3. Get Full Name",\
@@ -37,7 +33,7 @@ class Employee:
                 "7. Save current employee list as .csv file",\
                 "8. Read new employees from .csv file", \
                 "9. Display all employee details", \
-                "10. Quit the Program"]
+                "10. Delete an employee"]
 
         result = ''
         for option in menuOptions:
@@ -45,6 +41,7 @@ class Employee:
         result += ">>> "
 
         option = input(f'{result}')
+        print() # add line after menu display
         if option == '1':
             return e.firstName
         
@@ -55,16 +52,20 @@ class Employee:
             return e.printFullName()
         
         elif option == '4':
-            return e.pay
+            return f'{e.firstName}\'s pay: ${e.pay}'
         
         elif option == '5':
             oldId = e.id
-            newId = int(input("Enter a new id: "))
+            try:
+                newId = int(input("Enter a new id: "))
+            except ValueError:
+                return f'[ERROR] Not a valid id!'
+                
             if newId not in employeeIDList:
                 e.id = newId
-                return f'Updated Employee Id {oldId} to {newId}'
+                return f'[INFO] Updated Employee Id {oldId} to {newId}.'
             else:
-                return f"id {newId} already exist"
+                return f'[ERROR] Employee id {newId} already exist!'
             
         elif option == '6':
             oldPay = e.pay
@@ -73,29 +74,35 @@ class Employee:
             return f'Updated Employee pay from {oldPay} to {e.pay}'
         
         elif option == '7':
+            employees.sort(key=lambda x:x.id)
             filePath = input('Please specify name of the output csv: ')
             currDir = os.getcwd()
             fullPath = currDir + os.sep + filePath
+            emp_count = 0
             with open(fullPath, 'w', newline='') as csv_file:
-                print("Reading...")
                 csv_writer = csv.writer(csv_file)
                 for employee in employees:
-                    print(employee.id, employee.firstName, employee.lastName, employee.pay)
                     lineFormat = [employee.id, employee.firstName, employee.lastName, employee.pay]
                     csv_writer.writerow(lineFormat)
+                    emp_count += 1
+            return f'Wrote {emp_count} enteries into {filePath}'
 
         elif option == '8':
             emp_count = 0
             filePath = input('Please specify the file path to read from: ')
             #filePath = os.path.abspath(filePath)
+
+            # kind of manipulate file
             filePath = str(Path(filePath).absolute())
 
+            # open file for reading
             with open(filePath) as csv_file:
                 csv_reader = csv.reader(csv_file)
                 for line in csv_reader:
                     line = list(line)
                     if int(line[0]) in employeeIDList:
-                        return "Error in csv update"
+                        # block update
+                        return "Error in csv update, please check if employee exist!"
                     else:
                         emp = Employee(int(line[0]), line[1], line[2], int(line[3]))
                         employees.append(emp)
@@ -103,10 +110,6 @@ class Employee:
                 print(f'\n[INFO] {emp_count} employees loaded into program...\n')
                 # can't use zero for return val as dealing with cost also
                 return 'csv updated'
-
-        elif option == '10':
-            print('Quitting Program...')
-            return
         
         elif option == "9":
             # employeesSorted = [em.firstName for em in employees]
@@ -114,10 +117,17 @@ class Employee:
             empInfoList = ""
             for employee in employees:
                 empInfoList += f"Employee {employee.printFullName()} has a salary of ${employee.pay} and email address of {employee.email}...\n"
-            empInfoList += "\n===========Last Entry=========\n"
+            empInfoList += "===========Last Entry=========\n"
             return empInfoList
-            
-        return 'Invalid option entered.'
+        
+        elif option == "10":
+            pass
+
+        elif option == '0':
+            print('Quitting Program...')
+            return
+        else:
+            return 'Invalid option entered.'
 
 employees = []
 emp1 = Employee(1, "Hohn", "Jammy", 500)
@@ -126,27 +136,39 @@ employees.append(emp1)
 employees.append(emp2)
 
 while True:
-    personnel = input("Enter an employee id: ")
-    try: 
-        personnel = int(personnel)
-    except ValueError:
-        print("Not a valid id!")
+    flag = False
+    personnel = input("\nEnter an employee id: ")
+    print()
+    if personnel != "":
+        try: 
+            personnel = int(personnel)
+        except ValueError:
+            flag = True
+            print("Not a valid id!")
+    else:
+        flag = True
+        print("Empty id. Try again...")
 
     found = False
     for e in employees:
         if e.id == personnel:
             res = e.getEmployeeProperties(employees, e)
-            if res != None and res != 'csv updated':
+            if res == None:
+                sys.exit(1)
+            elif res == 'csv updated': # csv updated
                 found = True
-                print(res)
-            elif res == 'csv updated': 
-                found = True # to satisfy flag (may need refactoring)
                 continue
-            elif res == 'Error in csv update':
+            # need to check if still needed
+            elif res == 'Error in csv update, please check if employee exist!': # duplicate entry
+                found = True
                 print("Duplicate id entry, please try again")
                 continue
             else:
-                sys.exit(1)
+                found = True
+                print(res)
+                continue
 
-    if not found:
+    if flag:
+        continue
+    elif not found:
         print(f"Employee {personnel} not in current Employee List.")
