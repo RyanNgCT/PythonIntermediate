@@ -21,7 +21,6 @@ class Employee:
     def changePay(self, value):
         self.pay = value
         return value
-    
 
     def getEmployeeProperties(self, employees, e):
         employeeIDList = [employee.id for employee in employees]
@@ -114,39 +113,43 @@ class Employee:
                         csv_writer.writerow(lineFormat)
                         emp_count += 1
                 else: # by right shouldn't even allow no ids
-                    return f'Employee List is empty. Populate Employee List first!'
+                    return f'[ERROR] Employee List is empty. Populate Employee List first!'
             if emp_count == 1:
-                return f'Wrote 1 entry into {filePath}'
+                return f'[INFO] Wrote 1 entry into {filePath}'
             else:
-                return f'Wrote {emp_count} entries into {filePath}'
+                return f'[INFO] Wrote {emp_count} entries into {filePath}'
 
         elif option == '8':
             emp_count = 0
             filePath = input('Please specify the file path to read from: ')
-            filePath = str(Path(filePath).absolute()) # full abs path
-
-            # open file for reading
-            with open(filePath) as csv_file:
-                csv_reader = csv.reader(csv_file)
-                for line in csv_reader:
-                    line = list(line)
-                    if int(line[0]) in employeeIDList:
-                        # block update
-                        return "Error in csv update, please check if employee exist!"
-                    else:
-                        emp = Employee(int(line[0]), line[1], line[2], int(line[3]))
-                        employees.append(emp)
-                        emp_count += 1
-                print(f'\n[INFO] {emp_count} employees loaded into program...\n')
-                # can't use zero for return val as dealing with cost also
-                return 'csv updated'
+            filePath = str(Path(filePath).absolute()) # convert to absolute
+            validPathCheck = Path(filePath).is_file()
+            if validPathCheck:
+                # open file for reading
+                with open(filePath) as csv_file:
+                    csv_reader = csv.reader(csv_file)
+                    for line in csv_reader:
+                        line = list(line)
+                         # block update for duplicate id
+                        if int(line[0]) in employeeIDList:
+                            return "[ERROR] Error in csv update, please check if employee already exist!"
+                        # no duplicate, so update
+                        else:
+                            emp = Employee(int(line[0]), line[1], line[2], int(line[3]))
+                            employees.append(emp)
+                            emp_count += 1
+                    print(f'\n[INFO] {emp_count} employees loaded into program...')
+                    # can't use zero for return val as dealing with cost also
+                    return '[INFO] Csv file updated.'
+            else:
+                return '[ERROR] File not found!'
         
         elif option == "9":
             # employeesSorted = [em.firstName for em in employees]
             employees.sort(key=lambda x:x.id)
             empInfoList = ""
             for employee in employees:
-                empInfoList += f"Employee {employee.printFullName()} has a salary of ${employee.pay} and email address of {employee.email}...\n"
+                empInfoList += f"[INFO] ({employee.id}) Employee {employee.printFullName()} has a salary of ${employee.pay} and email address of {employee.email}.\n"
             empInfoList += "===========Last Entry=========\n"
             return empInfoList
         
@@ -165,10 +168,10 @@ class Employee:
             return f'[INFO] Done removing employee.'
 
         elif option == '0':
-            print('Quitting Program...')
+            print('[INFO] Quitting Program...')
             return
         else:
-            return 'Invalid option entered.'
+            return '[ERROR] Invalid option entered.'
 
 employees = []
 emp1 = Employee(1, "Hohn", "Jammy", 500)
@@ -200,9 +203,9 @@ while True:
             # elif res == 'csv updated': 
             #     found = True
             #     continue
-            elif res == 'Error in csv update, please check if employee exist!': # duplicate entry
+            elif res == '[ERROR] Error in csv update, please check if employee exist!': # duplicate entry
                 found = True
-                print("Duplicate id entry, please try again")
+                print("\nDuplicate id entry, please try again")
                 continue
             else:
                 found = True
@@ -212,4 +215,4 @@ while True:
     if flag:
         continue
     elif not found:
-        print(f"Employee {personnel} not in current Employee List.")
+        print(f"[ERROR] Employee {personnel} not in current Employee List.")
