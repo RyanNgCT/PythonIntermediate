@@ -88,11 +88,18 @@ class Employee:
             emp_count = 0
             with open(fullPath, 'w', newline='') as csv_file:
                 csv_writer = csv.writer(csv_file)
-                for employee in employees:
-                    lineFormat = [employee.id, employee.firstName, employee.lastName, employee.pay]
-                    csv_writer.writerow(lineFormat)
-                    emp_count += 1
-            return f'Wrote {emp_count} enteries into {filePath}'
+                if employees != []:
+                    for employee in employees:
+                        lineFormat = [employee.id, employee.firstName, employee.lastName, employee.pay]
+                        csv_writer.writerow(lineFormat)
+                        emp_count += 1
+                else: # by right shouldn't even allow no ids
+                    return f'Employee List is empty. Populate Employee List first!'
+            if emp_count == 1:
+                return f'Wrote 1 entry into {filePath}'
+            else:
+                return f'Wrote {emp_count} entries into {filePath}'
+
 
         elif option == '8':
             emp_count = 0
@@ -135,6 +142,7 @@ class Employee:
             for employee in employees:
                 if employee.id == idToRemove:
                     employees.remove(employee)
+            #employees = list(filter(lambda x: x.id != idToRemove, employees))
             return f'[INFO] Done removing employee.'
 
         elif option == '0':
