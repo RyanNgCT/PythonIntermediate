@@ -18,6 +18,10 @@ class Employee:
         self.pay = self.pay * magnitude
         return int(self.pay) # cast back
     
+    def changePay(self, value):
+        self.pay = value
+        return value
+    
 
     def getEmployeeProperties(self, employees, e):
         employeeIDList = [employee.id for employee in employees]
@@ -68,16 +72,32 @@ class Employee:
                 return f'[ERROR] Employee id {newId} already exist!'
             
         elif option == '6':
-            oldPay = e.pay
-            magnitude = input('Enter a magnitude for pay adjustment: ')
-            try:
-                if float(magnitude) >= 0:
-                    magnitude = float(magnitude)
-                else:
-                    return f'[ERROR] Negative magnitude is not allowed!'
+            internalOpt = input('Select an option:\n1) Change pay using magnitude\n2) Update pay manually\n>>> ')
+            try: 
+                internalOpt = int(internalOpt)
             except ValueError:
-                return f'[ERROR] Not a valid magnitude!'
-            e.pay = e.applyRaise(magnitude)
+                return f'[ERROR] Not a valid numerical option entered!'
+            if internalOpt == 1:
+                oldPay = e.pay
+                magnitude = input('Enter a magnitude for pay adjustment: ')
+                try:
+                    if float(magnitude) >= 0:
+                        magnitude = float(magnitude)
+                    else:
+                        return f'[ERROR] Negative magnitude is not allowed!'
+                except ValueError:
+                    return f'[ERROR] Not a valid magnitude!'
+                e.pay = e.applyRaise(magnitude)
+            elif internalOpt == 2:
+                oldPay = e.pay
+                newPay = input('Enter a pay value in $: ')
+                try: 
+                    newPay = int(newPay)
+                except ValueError:
+                    return f'[ERROR] Not a valid pay value.'
+                e.pay = e.changePay(newPay)
+            else:
+                return f'[ERROR] Enter an valid option (1/2) only!'
             return f'[INFO] Updated Employee pay from {oldPay} to {e.pay}'
         
         elif option == '7':
@@ -99,7 +119,6 @@ class Employee:
                 return f'Wrote 1 entry into {filePath}'
             else:
                 return f'Wrote {emp_count} entries into {filePath}'
-
 
         elif option == '8':
             emp_count = 0
@@ -178,9 +197,9 @@ while True:
             if res == None:
                 sys.exit(1)
             # need to check if still needed
-            elif res == 'csv updated': 
-                found = True
-                continue
+            # elif res == 'csv updated': 
+            #     found = True
+            #     continue
             elif res == 'Error in csv update, please check if employee exist!': # duplicate entry
                 found = True
                 print("Duplicate id entry, please try again")
