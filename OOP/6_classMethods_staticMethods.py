@@ -1,7 +1,6 @@
 from multipledispatch import dispatch
 
 class Employee:
-    # class variables (access using className.variableName) -> differ from video
     raiseAmount = 200
     numOfEmps = 0
 
@@ -25,16 +24,19 @@ class Employee:
 
     @dispatch()
     def applyRaise(self):
-        self.pay += Employee.raiseAmount # can also use self.raiseAmount
+        self.pay += Employee.raiseAmount
+
+    # defining class methods: add 'classmethod' decorator to top of method signature
+    @classmethod
+    def setRaiseAmt(cls, amount):
+        cls.raiseAmount = amount
 
 
 emp1 = Employee(1, "Hohn", "Jammy", 500)
 emp2 = Employee(2, "Moike", "Wasowski", 100)
-print(f'{emp1.firstName}\'s initial pay is ${emp1.pay}, while {emp2.firstName}\'s initial pay is ${emp2.pay}.')
 
-emp1.applyRaise()
-emp2.applyRaise(10)
-print(f'{emp1.firstName}\'s pay is updated to ${emp1.pay}, while {emp2.firstName}\'s pay is updated to ${emp2.pay}.')
+Employee.setRaiseAmt(500) # same as Employee.raiseAmount = 500
 
-print(f'\nEmployee 1 properties: {emp1.__dict__}')
-print(f'There are {Employee.numOfEmps} employees recorded.')
+# All the same since we are working with classes rather than instances
+print(Employee.raiseAmount) 
+print(emp1.raiseAmount, emp2.raiseAmount)

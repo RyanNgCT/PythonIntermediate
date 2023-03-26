@@ -1,3 +1,5 @@
+# EmployeeApp v1, (c) RyanNgCT 2023
+
 import sys, os, csv
 from pathlib import Path
 
