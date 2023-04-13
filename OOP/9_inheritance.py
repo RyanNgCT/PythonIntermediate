@@ -66,6 +66,12 @@ emp3 = Manager(3, "Jim", "Sully", 300)
 print(f'{emp2.firstName}\'s pay is ${emp2.pay}.')
 #print(f'{emp3.firstName}\'s pay is ${emp3.pay}.')
 
+# check if emp2/devlpr is an instance of emp class
+print(isinstance(emp2, Employee)) 
+
+# check if developer subclass of emp class
+print(issubclass(Developer, Employee))
+
 emp2.applyRaise()
 
 print(f'{emp2.firstName}\'s pay after the raise is ${int(emp2.pay)} and he learns {emp2.progLang}.')
