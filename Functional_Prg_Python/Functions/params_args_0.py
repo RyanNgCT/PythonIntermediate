@@ -7,3 +7,10 @@ def greet(name : str, greeting : str = "Hello"):
 greet('Denver')
 greet('Berlin', 'Ciao')
 greet(greeting='So long', name='Dude') # when using positional args and specifying params, all args must be spelt out
+
+
+# syntax for return type hinting is def func() -> type_of_retVal: ...
+def sum_numbers(a : int, b : int) -> float:
+    return a + b
+
+print(sum_numbers(5, 10))
