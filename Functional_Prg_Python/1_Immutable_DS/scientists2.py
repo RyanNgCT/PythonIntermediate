@@ -1,7 +1,7 @@
 import collections
 from pprint import pprint
 
-# define Scientist object
+# define Scientist factory function (sort of like an object)
 Scientist = collections.namedtuple('Scientist', [
     'name',
     'field',
