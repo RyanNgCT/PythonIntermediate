@@ -2,6 +2,7 @@ from multipledispatch import dispatch
 
 class Employee:
     # class variables (access using className.variableName) -> differ from video
+    # seperately created compared to instance variables, but can be used by all objects instantiated
     raiseAmount = 200
     numOfEmps = 0
 
